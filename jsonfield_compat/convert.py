@@ -2,6 +2,7 @@ from __future__ import print_function
 
 from django.db import connection
 from django.db.models.signals import post_migrate
+from django.conf import settings
 
 from jsonfield_compat.fields import JSONField
 from jsonfield_compat.util import is_db_postgresql, use_native_jsonfield, \
@@ -49,4 +50,7 @@ def handler_convert_json_fields(sender, **kwargs):
 
 
 def register_app(app_config):
+    if getattr(settings, 'JSONFIELD_COMPAT_SKIP_POST_MIGRATION_JSON_FIXES', False):
+        return
+
     post_migrate.connect(handler_convert_json_fields, sender=app_config)
